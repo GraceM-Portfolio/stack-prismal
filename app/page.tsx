@@ -85,7 +85,7 @@ export default function Home() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-primary/20 shadow-lg mb-6">
               <Sparkles className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent">
-                AI-Powered Analytics Suite
+                Analytics Suite
               </span>
               <Badge variant="outline" className="ml-2 border-primary/30 bg-primary/5 text-primary text-xs">
                 New
