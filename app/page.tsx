@@ -1,441 +1,498 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  CheckCircle2, ArrowRight, Star, Sparkles, Zap, 
-  Code2, Palette, Layout, Globe, Monitor, Brush, 
-  TrendingUp, Users, Layers, ChevronRight, Instagram,
-  ArrowUp, MoveRight, Award, Eye, Filter
-} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  CheckCircle2,
+  ArrowRight,
+  Star,
+  Sparkles,
+  Code2,
+  Palette,
+  Brush,
+  Layers,
+  Diamond,
+  Instagram,
+  ChevronDown,
+} from "lucide-react";
 
-// Portfolio items data
-const portfolioItems = [
-  { id: 1, title: "LUMINA COSMETICS", category: "Web Design", image: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&h=400&fit=crop", desc: "E-commerce UX redesign" },
-  { id: 2, title: "NOVA IDENTITY", category: "Logos", image: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=600&h=400&fit=crop", desc: "Minimalist brand mark" },
-  { id: 3, title: "DIGITAL ALCHEMY", category: "Digital Art", image: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&h=400&fit=crop", desc: "Generative NFT collection" },
-  { id: 4, title: "VERTEX STUDIO", category: "Web Design", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop", desc: "Agency portfolio platform" },
-  { id: 5, title: "EIDETIC", category: "Logos", image: "https://images.unsplash.com/photo-1598550874175-4d0ef436c909?w=600&h=400&fit=crop", desc: "Tech startup wordmark" },
-  { id: 6, title: "CHROMATIC ESCAPE", category: "Digital Art", image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&h=400&fit=crop", desc: "Abstract visual series" },
-];
+/* ------------------------------------------------------------------ */
+/*  Custom Before/After Image Slider (used in the redesign block)    */
+/* ------------------------------------------------------------------ */
+function BeforeAfterSlider() {
+  const [position, setPosition] = useState(50); // percentage from left
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
 
-export default function Home() {
-  const [activeFilter, setActiveFilter] = useState("All");
-  const filters = ["All", "Web Design", "Logos", "Digital Art"];
-  
-  const filteredPortfolio = activeFilter === "All" 
-    ? portfolioItems 
-    : portfolioItems.filter(item => item.category === activeFilter);
+  const updatePosition = useCallback((clientX: number) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const newPos = Math.min(100, Math.max(0, (x / rect.width) * 100));
+    setPosition(newPos);
+  }, []);
 
-  // Smooth scroll helper
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    element?.scrollIntoView({ behavior: "smooth" });
+  const handleMouseDown = () => {
+    dragging.current = true;
+    document.body.style.userSelect = "none";
+  };
+  const handleMouseUp = () => {
+    dragging.current = false;
+    document.body.style.userSelect = "";
+  };
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!dragging.current) return;
+    updatePosition(e.clientX);
   };
 
+  const handleTouchMove = (e: React.TouchEvent) => {
+    updatePosition(e.touches[0].clientX);
+  };
+
+  useEffect(() => {
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen bg-white text-gray-900">
-      {/* Header Navigation */}
-      <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
-        <div className="container mx-auto flex h-20 items-center justify-between px-4 md:px-8">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => scrollToSection("hero")}>
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-200">
-              S
+    <div
+      ref={containerRef}
+      className="relative w-full h-80 md:h-96 rounded-xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-800 select-none"
+      onMouseDown={handleMouseDown}
+      onTouchStart={handleMouseDown}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleMouseUp}
+    >
+      {/* Before image (old website) */}
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='800' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100%25' height='100%25' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='45%25' text-anchor='middle' font-family='sans-serif' font-size='30' fill='%23999'%3EOutdated Website%3C/text%3E%3C/svg%3E")`,
+        }}
+      />
+      {/* After image (new design) – clipped from the left */}
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          clipPath: `polygon(0 0, ${position}% 0, ${position}% 100%, 0 100%)`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='800' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100%25' height='100%25' fill='%231a1a2e'/%3E%3Ctext x='50%25' y='45%25' text-anchor='middle' font-family='sans-serif' font-size='30' fill='%23c084fc'%3EModern Design%3C/text%3E%3C/svg%3E")`,
+        }}
+      />
+      {/* Draggable handle */}
+      <div
+        className="absolute top-0 bottom-0 w-1 bg-white shadow-lg cursor-ew-resize"
+        style={{ left: `calc(${position}% - 2px)` }}
+      >
+        <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center">
+          <span className="text-xs font-bold text-gray-700">↔</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main Page Component                                               */
+/* ------------------------------------------------------------------ */
+export default function Home() {
+  const [filter, setFilter] = useState("All");
+
+  // Sample portfolio items
+  const portfolioItems = [
+    { id: 1, title: "Nova Brand Suite", category: "Logos", img: "🌌" },
+    { id: 2, title: "Stellar E-Commerce", category: "Web Design", img: "🛍️" },
+    { id: 3, title: "Prismal Abstracts", category: "Digital Art", img: "🎨" },
+    { id: 4, title: "Aether Dashboard", category: "Web Design", img: "📊" },
+    { id: 5, title: "Crystal Mark", category: "Logos", img: "💎" },
+    { id: 6, title: "Fluid Motion", category: "Digital Art", img: "💧" },
+  ];
+
+  const filteredItems = filter === "All"
+    ? portfolioItems
+    : portfolioItems.filter((item) => item.category === filter);
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50/80 dark:from-gray-950 dark:to-gray-900/80 text-gray-900 dark:text-gray-100">
+      {/* ---- Header ---- */}
+      <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 dark:bg-gray-950/80">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-500 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/30">
+              SP
             </div>
-            <span className="text-2xl font-bold tracking-tight">
-              <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Stack</span>
-              <span className="text-gray-900"> Prismal</span>
+            <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-purple-500 bg-clip-text text-transparent">
+              Stack Prismal
             </span>
           </div>
-          
-          <nav className="hidden md:flex items-center gap-8">
-            <button onClick={() => scrollToSection("work")} className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">Work</button>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-6">
+            <a href="#work" className="text-sm font-medium hover:text-indigo-500 transition-colors">
+              Work
+            </a>
+
             <DropdownMenu>
-              <DropdownMenuTrigger className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors flex items-center gap-1">
-                Services <ChevronRight className="h-3 w-3 rotate-90" />
+              <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium hover:text-indigo-500 transition-colors cursor-pointer">
+                Services <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-56 p-2 shadow-xl border-0 rounded-xl">
-                <DropdownMenuItem onClick={() => scrollToSection("services")} className="cursor-pointer rounded-lg py-2">
-                  <Code2 className="mr-2 h-4 w-4 text-indigo-500" /> Web Architecture
+              <DropdownMenuContent className="w-48 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-gray-200 dark:border-gray-800">
+                <DropdownMenuItem>
+                  <a href="#services" className="w-full">Web Architecture</a>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => scrollToSection("services")} className="cursor-pointer rounded-lg py-2">
-                  <Palette className="mr-2 h-4 w-4 text-purple-500" /> Brand Identity
+                <DropdownMenuItem>
+                  <a href="#services" className="w-full">Brand Identity</a>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => scrollToSection("services")} className="cursor-pointer rounded-lg py-2">
-                  <Brush className="mr-2 h-4 w-4 text-pink-500" /> Digital Art & Assets
+                <DropdownMenuItem>
+                  <a href="#services" className="w-full">Digital Art & Assets</a>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <button onClick={() => scrollToSection("about")} className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">About</button>
+
+            <a href="#about" className="text-sm font-medium hover:text-indigo-500 transition-colors">
+              About
+            </a>
           </nav>
-          
-          <Button className="shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all rounded-full px-6 bg-indigo-600 hover:bg-indigo-700">
-            Start a Project <ArrowRight className="ml-2 h-4 w-4" />
+
+          {/* CTA */}
+          <Button
+            size="sm"
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all"
+          >
+            Start a Project
           </Button>
         </div>
       </header>
 
       <main className="flex-1">
-        {/* Hero Section - Split Screen */}
-        <section id="hero" className="relative min-h-[90vh] overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/30 via-white to-purple-50/30" />
-          <div className="container mx-auto px-4 md:px-8 py-20 lg:py-28 relative z-10">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* Left: Text Content */}
+        {/* ---- Hero Section ---- */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-purple-950/30">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%239C92AC\' fill-opacity=\'0.05\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20 dark:opacity-10" />
+          <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl" />
+          <div className="absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-purple-500/10 blur-3xl" />
+
+          <div className="container mx-auto px-4 py-20 md:py-32">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              {/* Text side */}
               <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm border border-gray-100 mb-8">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-indigo-500/20 shadow-lg mb-6">
                   <Sparkles className="h-4 w-4 text-indigo-500" />
-                  <span className="text-sm font-medium text-gray-700">Premium Creative-Tech Studio</span>
+                  <span className="text-sm font-medium bg-gradient-to-r from-indigo-600 to-purple-500 bg-clip-text text-transparent">
+                    Premium Studio
+                  </span>
+                  <Badge variant="outline" className="ml-2 border-indigo-300/30 bg-indigo-50/50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-xs">
+                    New
+                  </Badge>
                 </div>
-                <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.2]">
-                  Where <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">Technical Precision</span><br />
-                  Meets Creative Vision.
+
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+                  <span className="block text-gray-900 dark:text-white">
+                    Where Technical
+                  </span>
+                  <span className="block text-gray-900 dark:text-white">
+                    Precision Meets
+                  </span>
+                  <span className="block bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                    Creative Vision.
+                  </span>
                 </h1>
-                <p className="text-xl text-gray-600 mt-6 leading-relaxed max-w-lg">
+
+                <p className="mt-6 text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-xl">
                   Building high-performance websites and distinct visual identities for brands that refuse to blend in.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 mt-10">
-                  <Button size="lg" className="rounded-full px-8 shadow-xl shadow-indigo-200 bg-indigo-600 hover:bg-indigo-700 text-base">
-                    View Our Work <MoveRight className="ml-2 h-4 w-4" />
+
+                <div className="mt-8 flex flex-wrap gap-4">
+                  <Button size="lg" className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all">
+                    View Our Work <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
-                  <Button size="lg" variant="outline" className="rounded-full px-8 border-2 text-base">
-                    Explore Services
+                  <Button variant="outline" size="lg" className="border-2 border-gray-300 dark:border-gray-700 hover:bg-indigo-50 dark:hover:bg-gray-800">
+                    Let’s Talk
                   </Button>
-                </div>
-                <div className="flex items-center gap-6 mt-12 pt-4">
-                  <div className="flex -space-x-2">
-                    {[1,2,3].map((i) => (
-                      <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 border-2 border-white" />
-                    ))}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Trusted by 50+ brands</p>
-                    <p className="text-xs text-gray-500">From startups to Fortune 500</p>
-                  </div>
                 </div>
               </div>
-              {/* Right: Split Visual */}
-              <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-                <div className="absolute inset-0 flex">
-                  <div className="w-1/2 bg-gradient-to-br from-indigo-900 to-indigo-700 flex items-center justify-center">
-                    <div className="text-center p-6">
-                      <Monitor className="h-20 w-20 text-white/80 mx-auto mb-4" />
-                      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 w-40 mx-auto">
-                        <div className="h-2 w-full bg-white/30 rounded-full mb-2" />
-                        <div className="h-2 w-3/4 bg-white/20 rounded-full" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-1/2 bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center">
-                    <Brush className="h-20 w-20 text-white/90" />
-                    <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 0h20v20H0V0zm20 20h20v20H20V20z\'/%3E%3C/g%3E%3C/svg%3E')]" />
-                  </div>
+
+              {/* Split-screen visual */}
+              <div className="relative h-80 md:h-96 rounded-2xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-800 grid grid-cols-2">
+                <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 dark:from-purple-800/50 dark:to-pink-800/50 flex items-center justify-center backdrop-blur-sm">
+                  <span className="text-6xl">🎨</span>
                 </div>
-                <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md rounded-full px-4 py-1 text-white text-xs">Web Architecture</div>
-                <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md rounded-full px-4 py-1 text-white text-xs">Digital Art</div>
+                <div className="bg-gradient-to-br from-indigo-500/20 to-blue-500/20 dark:from-indigo-800/50 dark:to-blue-800/50 flex items-center justify-center backdrop-blur-sm">
+                  <span className="text-6xl">💻</span>
+                </div>
+                {/* Overlay line */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="absolute top-0 bottom-0 left-1/2 w-px bg-white/50 dark:bg-gray-600" />
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Work / Portfolio Section with Filtering */}
-        <section id="work" className="container mx-auto px-4 py-24 md:py-32 border-t border-gray-100">
-          <div className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 border-indigo-200 bg-indigo-50 text-indigo-700 rounded-full px-4 py-1">PORTFOLIO</Badge>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Selected works</h2>
-            <p className="mt-4 text-gray-600 max-w-2xl mx-auto">Blending technical excellence with artistic expression</p>
-          </div>
-          
-          {/* Filter Buttons */}
-          <div className="flex flex-wrap justify-center gap-3 mb-12">
-            {filters.map((filter) => (
-              <button
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-                  activeFilter === filter
-                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-200"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+        {/* ---- Portofolio (Work) Section ---- */}
+        <section id="work" className="container mx-auto px-4 py-20 border-t border-gray-200 dark:border-gray-800">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-center bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
+            Our Work
+          </h2>
+          <p className="mt-4 text-lg text-gray-600 dark:text-gray-400 text-center max-w-2xl mx-auto">
+            A curated look at what we create for brands that demand distinction.
+          </p>
+
+          {/* Filter tabs */}
+          <div className="flex justify-center gap-3 mt-8 mb-12">
+            {["All", "Web Design", "Logos", "Digital Art"].map((cat) => (
+              <Button
+                key={cat}
+                variant={filter === cat ? "default" : "ghost"}
+                size="sm"
+                className={`rounded-full px-5 ${
+                  filter === cat
+                    ? "bg-indigo-600 text-white shadow-md"
+                    : "text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
                 }`}
+                onClick={() => setFilter(cat)}
               >
-                {filter}
-              </button>
-            ))}
-          </div>
-          
-          {/* Portfolio Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredPortfolio.map((item) => (
-              <div key={item.id} className="group relative rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                  <Badge className="w-fit mb-2 bg-white/20 backdrop-blur-sm text-white border-0">{item.category}</Badge>
-                  <h3 className="text-white text-xl font-bold">{item.title}</h3>
-                  <p className="text-gray-200 text-sm">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Services Section - Three Pillars */}
-        <section id="services" className="bg-gradient-to-b from-gray-50 to-white border-y border-gray-100 py-24 md:py-32">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <Badge variant="outline" className="mb-4 border-indigo-200 bg-indigo-50 text-indigo-700 rounded-full px-4 py-1">EXPERTISE</Badge>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Three pillars of <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">excellence</span></h2>
-              <p className="mt-4 text-gray-600 max-w-2xl mx-auto">Comprehensive solutions that cover every angle of your digital presence</p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8">
-              <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 rounded-2xl">
-                <CardHeader>
-                  <div className="h-14 w-14 rounded-2xl bg-indigo-100 flex items-center justify-center mb-6">
-                    <Code2 className="h-7 w-7 text-indigo-600" />
-                  </div>
-                  <CardTitle className="text-2xl">Web Architecture</CardTitle>
-                  <CardDescription className="text-gray-500 mt-2">Custom coding, redesigns, and mobile optimization</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-indigo-500" />Performance-first engineering</li>
-                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-indigo-500" />SEO & conversion optimized</li>
-                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-indigo-500" />Headless & traditional CMS</li>
-                  </ul>
-                  <div className="mt-6 pt-4 border-t border-gray-100">
-                    <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">Focus: Speed & Results</span>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 rounded-2xl">
-                <CardHeader>
-                  <div className="h-14 w-14 rounded-2xl bg-purple-100 flex items-center justify-center mb-6">
-                    <Palette className="h-7 w-7 text-purple-600" />
-                  </div>
-                  <CardTitle className="text-2xl">Brand Identity</CardTitle>
-                  <CardDescription className="text-gray-500 mt-2">Logo design, typography, and visual language</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-purple-500" />Distinct positioning</li>
-                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-purple-500" />Comprehensive guidelines</li>
-                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-purple-500" />Memorable visual systems</li>
-                  </ul>
-                  <div className="mt-6 pt-4 border-t border-gray-100">
-                    <span className="text-xs font-semibold text-purple-600 uppercase tracking-wider">Focus: Being Unforgettable</span>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 rounded-2xl">
-                <CardHeader>
-                  <div className="h-14 w-14 rounded-2xl bg-pink-100 flex items-center justify-center mb-6">
-                    <Brush className="h-7 w-7 text-pink-600" />
-                  </div>
-                  <CardTitle className="text-2xl">Digital Art & Assets</CardTitle>
-                  <CardDescription className="text-gray-500 mt-2">Custom illustrations, prints, and motion graphics</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-pink-500" />Original digital paintings</li>
-                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-pink-500" />3D & generative art</li>
-                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-pink-500" />Limited edition prints</li>
-                  </ul>
-                  <div className="mt-6 pt-4 border-t border-gray-100">
-                    <span className="text-xs font-semibold text-pink-600 uppercase tracking-wider">Focus: Unique Aesthetics</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        {/* Stack vs Prismal Section - Brand Story */}
-        <section className="container mx-auto px-4 py-24 md:py-32">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <Badge variant="outline" className="mb-4 border-indigo-200 bg-indigo-50 text-indigo-700 rounded-full">THE DUAL IDENTITY</Badge>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
-                The <span className="bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent">Stack</span> meets 
-                the <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Prismal</span>
-              </h2>
-              <div className="mt-8 space-y-6">
-                <div className="border-l-4 border-indigo-500 pl-6">
-                  <h3 className="text-2xl font-semibold flex items-center gap-2"><Code2 className="h-5 w-5 text-indigo-500" /> The Stack</h3>
-                  <p className="text-gray-600 mt-2">Clean code, robust architecture, SEO-first thinking, and bulletproof functionality. We engineer digital experiences that perform relentlessly.</p>
-                </div>
-                <div className="border-l-4 border-purple-500 pl-6">
-                  <h3 className="text-2xl font-semibold flex items-center gap-2"><Brush className="h-5 w-5 text-purple-500" /> The Prismal</h3>
-                  <p className="text-gray-600 mt-2">Color theory, emotional design, digital painting, and visual storytelling. We craft identities that resonate deeply and stand out.</p>
-                </div>
-              </div>
-              <p className="mt-8 text-lg text-gray-700 bg-gray-50 p-6 rounded-2xl italic">"You don't have to choose between a boring coder and a flaky artist. You get both."</p>
-            </div>
-            <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 rounded-3xl p-8 shadow-xl">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white rounded-xl p-4 shadow-md text-center">
-                  <Zap className="h-8 w-8 text-indigo-500 mx-auto" />
-                  <p className="font-mono text-sm mt-2">99.9% Uptime</p>
-                </div>
-                <div className="bg-white rounded-xl p-4 shadow-md text-center">
-                  <Award className="h-8 w-8 text-purple-500 mx-auto" />
-                  <p className="font-mono text-sm mt-2">Awwwards Nom.</p>
-                </div>
-                <div className="bg-white rounded-xl p-4 shadow-md text-center">
-                  <Globe className="h-8 w-8 text-cyan-500 mx-auto" />
-                  <p className="font-mono text-sm mt-2">Global Clients</p>
-                </div>
-                <div className="bg-white rounded-xl p-4 shadow-md text-center">
-                  <Eye className="h-8 w-8 text-pink-500 mx-auto" />
-                  <p className="font-mono text-sm mt-2">Art Exhibitions</p>
-                </div>
-              </div>
-              <div className="absolute -top-4 -right-4 w-24 h-24 bg-indigo-100 rounded-full blur-3xl opacity-50" />
-            </div>
-          </div>
-        </section>
-
-        {/* Redesign Specialized Block - Before & After */}
-        <section className="bg-gray-900 text-white py-24 md:py-32">
-          <div className="container mx-auto px-4">
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <Badge variant="outline" className="mb-4 border-white/30 bg-white/10 text-white rounded-full">REDESIGN SPECIALIST</Badge>
-              <h2 className="text-4xl md:text-5xl font-bold">Is your current website costing you customers?</h2>
-              <p className="text-xl text-gray-300 mt-4">We transform outdated sites into high-converting digital assets.</p>
-            </div>
-            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              <div className="bg-gray-800 rounded-2xl overflow-hidden shadow-2xl">
-                <div className="bg-red-500/10 p-4 border-b border-red-500/20">
-                  <h3 className="text-xl font-semibold flex items-center gap-2"><span className="text-red-400">●</span> Before</h3>
-                </div>
-                <div className="p-6">
-                  <div className="bg-gray-700 rounded-lg h-48 mb-4 flex items-center justify-center">
-                    <Layout className="h-16 w-16 text-gray-500" />
-                  </div>
-                  <ul className="space-y-2 text-gray-300">
-                    <li className="flex items-center gap-2"><span className="text-red-400">✗</span> Slow load times</li>
-                    <li className="flex items-center gap-2"><span className="text-red-400">✗</span> Outdated aesthetics</li>
-                    <li className="flex items-center gap-2"><span className="text-red-400">✗</span> Low conversion rates</li>
-                  </ul>
-                </div>
-              </div>
-              <div className="bg-gray-800 rounded-2xl overflow-hidden shadow-2xl border-2 border-indigo-500">
-                <div className="bg-indigo-500/10 p-4 border-b border-indigo-500/20">
-                  <h3 className="text-xl font-semibold flex items-center gap-2"><span className="text-green-400">●</span> After</h3>
-                </div>
-                <div className="p-6">
-                  <div className="bg-gradient-to-br from-indigo-900 to-purple-900 rounded-lg h-48 mb-4 flex items-center justify-center">
-                    <Sparkles className="h-16 w-16 text-white" />
-                  </div>
-                  <ul className="space-y-2 text-gray-300">
-                    <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Blazing fast (LCP &lt; 2s)</li>
-                    <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Modern, artistic design</li>
-                    <li className="flex items-center gap-2"><span className="text-green-400">✓</span> +156% conversion lift</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div className="text-center mt-12">
-              <Button size="lg" className="rounded-full bg-white text-gray-900 hover:bg-gray-100 shadow-xl shadow-white/20">
-                Request a Redesign Audit <ArrowRight className="ml-2 h-4 w-4" />
+                {cat}
               </Button>
+            ))}
+          </div>
+
+          {/* Portfolio grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredItems.map((item) => (
+              <Card
+                key={item.id}
+                className="group border-gray-200 dark:border-gray-800 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"
+              >
+                <div className="h-48 flex items-center justify-center text-5xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 group-hover:scale-105 transition-transform">
+                  {item.img}
+                </div>
+                <CardHeader className="pt-4">
+                  <CardTitle className="text-lg">{item.title}</CardTitle>
+                  <CardDescription>{item.category}</CardDescription>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        {/* ---- Services Section ---- */}
+        <section
+          id="services"
+          className="container mx-auto px-4 py-20 border-t border-gray-200 dark:border-gray-800 bg-gradient-to-b from-indigo-50/30 to-white dark:from-gray-900/50 dark:to-gray-950"
+        >
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-center">
+            Our Core Pillars
+          </h2>
+          <p className="mt-4 text-lg text-gray-600 dark:text-gray-400 text-center max-w-2xl mx-auto">
+            Three integrated disciplines that work together to elevate your brand.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-8 mt-12">
+            {/* Web Architecture */}
+            <Card className="group border-0 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2">
+              <CardHeader>
+                <div className="h-12 w-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mb-4">
+                  <Code2 className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <CardTitle className="text-xl">Web Architecture</CardTitle>
+                <CardDescription className="text-base">
+                  Custom coding, strategic redesigns, and mobile optimization that put{" "}
+                  <span className="font-semibold text-indigo-600 dark:text-indigo-400">speed and results</span> first.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            {/* Brand Identity */}
+            <Card className="group border-0 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2">
+              <CardHeader>
+                <div className="h-12 w-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-4">
+                  <Palette className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <CardTitle className="text-xl">Brand Identity</CardTitle>
+                <CardDescription className="text-base">
+                  Logo design and typography crafted to make you{" "}
+                  <span className="font-semibold text-purple-600 dark:text-purple-400">unforgettable</span>.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            {/* Digital Art & Assets */}
+            <Card className="group border-0 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2">
+              <CardHeader>
+                <div className="h-12 w-12 rounded-xl bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center mb-4">
+                  <Brush className="h-6 w-6 text-pink-600 dark:text-pink-400" />
+                </div>
+                <CardTitle className="text-xl">Digital Art & Assets</CardTitle>
+                <CardDescription className="text-base">
+                  Custom illustrations and prints with a{" "}
+                  <span className="font-semibold text-pink-600 dark:text-pink-400">unique aesthetic</span> that no template can replicate.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        </section>
+
+        {/* ---- Brand Story: Stack vs Prismal ---- */}
+        <section id="about" className="container mx-auto px-4 py-20 border-t border-gray-200 dark:border-gray-800">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-center">
+              The Meaning Behind the Name
+            </h2>
+            <div className="grid md:grid-cols-2 gap-12 mt-12 items-center">
+              {/* The Stack */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <Layers className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+                  <h3 className="text-2xl font-bold">The Stack</h3>
+                </div>
+                <p className="text-lg text-gray-600 dark:text-gray-400">
+                  Clean, scalable code. SEO-first architecture. Blazing-fast performance.
+                  This is the technical backbone that ensures your digital presence
+                  works as hard as you do.
+                </p>
+              </div>
+
+              {/* The Prismal */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <Diamond className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                  <h3 className="text-2xl font-bold">The Prismal</h3>
+                </div>
+                <p className="text-lg text-gray-600 dark:text-gray-400">
+                  Color theory, digital painting, and visual storytelling.
+                  We bend light through your brand’s essence, creating a spectrum of
+                  art that captivates and converts.
+                </p>
+              </div>
+            </div>
+            <p className="mt-12 text-center text-xl text-gray-800 dark:text-gray-200 font-medium italic max-w-3xl mx-auto">
+              You no longer have to choose between a “boring coder” and a “flaky artist.”<br />
+              We are both.
+            </p>
+          </div>
+        </section>
+
+        {/* ---- Redesign Specialized Block ---- */}
+        <section className="container mx-auto px-4 py-20 border-t border-gray-200 dark:border-gray-800 bg-gradient-to-b from-gray-50/50 to-white dark:from-gray-900/50 dark:to-gray-950">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                  Is your current website costing you customers?
+                </h2>
+                <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+                  We transform outdated sites into high-converting digital assets. See the difference.
+                </p>
+                <Button variant="outline" size="lg" className="mt-6 border-2 border-indigo-500 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950">
+                  Start a Redesign
+                </Button>
+              </div>
+              <div>
+                <BeforeAfterSlider />
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Process Section - 3 Simple Steps */}
-        <section className="container mx-auto px-4 py-24 md:py-32">
-          <div className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 border-indigo-200 bg-indigo-50 text-indigo-700 rounded-full">SIMPLE PROCESS</Badge>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">From concept to launch in <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">three steps</span></h2>
-            <p className="mt-4 text-gray-600 max-w-2xl mx-auto">No complexity, no surprises. Just a smooth path to an exceptional digital presence.</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <div className="text-center relative">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-400 text-white flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-xl shadow-indigo-200">1</div>
-              <h3 className="text-2xl font-semibold mb-3">Discovery</h3>
-              <p className="text-gray-600">We talk about your goals, vision, and audience. Deep dive into your brand story and technical needs.</p>
-            </div>
-            <div className="text-center relative">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-400 text-white flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-xl shadow-purple-200">2</div>
-              <h3 className="text-2xl font-semibold mb-3">Creation</h3>
-              <p className="text-gray-600">We build your custom "Stack" (tech) and "Prism" (art) elements — iterative design and development.</p>
-            </div>
-            <div className="text-center relative">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-pink-600 to-pink-400 text-white flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-xl shadow-pink-200">3</div>
-              <h3 className="text-2xl font-semibold mb-3">Launch</h3>
-              <p className="text-gray-600">Your brand goes live and starts performing. We provide post-launch support and analytics.</p>
-            </div>
+        {/* ---- Process Section ---- */}
+        <section className="container mx-auto px-4 py-20 border-t border-gray-200 dark:border-gray-800">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-center">
+            How We Work
+          </h2>
+          <p className="mt-4 text-lg text-gray-600 dark:text-gray-400 text-center max-w-2xl mx-auto">
+            A simple, collaborative process that eliminates the stress of a digital build.
+          </p>
+          <div className="grid md:grid-cols-3 gap-8 mt-12 max-w-5xl mx-auto relative">
+            {[
+              { step: "01", title: "Discovery", desc: "We talk about your goals, audience, and vision." },
+              { step: "02", title: "Creation", desc: "I build your custom Stack and Prismal elements." },
+              { step: "03", title: "Launch", desc: "Your brand goes live and starts performing." },
+            ].map((p, idx) => (
+              <div key={idx} className="text-center relative z-10">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 text-white flex items-center justify-center mx-auto mb-4 text-xl font-bold shadow-lg shadow-indigo-500/30">
+                  {p.step}
+                </div>
+                <h3 className="text-xl font-semibold">{p.title}</h3>
+                <p className="mt-2 text-gray-600 dark:text-gray-400">{p.desc}</p>
+              </div>
+            ))}
           </div>
         </section>
 
-        {/* About Section - Origin Story */}
-        <section id="about" className="bg-gray-50 border-y border-gray-100 py-24 md:py-32">
-          <div className="container mx-auto px-4 text-center max-w-4xl">
-            <Badge variant="outline" className="mb-4 border-indigo-200 bg-indigo-50 text-indigo-700 rounded-full">OUR ORIGIN STORY</Badge>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Frustrated by the <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">divide</span> between devs and designers</h2>
-            <p className="text-xl text-gray-600 mt-6 leading-relaxed">Stack Prismal was born from a simple belief: the best digital work happens when technical rigor and artistic vision are fused from day one. We're a studio of engineer-artists who speak both languages fluently.</p>
-            <div className="mt-10 flex justify-center gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-indigo-600">50+</div>
-                <div className="text-sm text-gray-500">Projects delivered</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-600">100%</div>
-                <div className="text-sm text-gray-500">Client retention rate</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-pink-600">12</div>
-                <div className="text-sm text-gray-500">Design awards</div>
-              </div>
+        {/* ---- Testimonial / Trust (minimal, premium) ---- */}
+        <section className="container mx-auto px-4 py-20 border-t border-gray-200 dark:border-gray-800 bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-900/80">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="flex justify-center gap-1 mb-6">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="h-5 w-5 fill-yellow-500 text-yellow-500" />
+              ))}
             </div>
+            <p className="text-xl md:text-2xl italic text-gray-700 dark:text-gray-300">
+              “Stack Prismal built us a brand and website that genuinely doubled our inbound leads. The technical skill and artistic eye are unmatched.”
+            </p>
+            <p className="mt-6 font-semibold text-gray-900 dark:text-white">Aria D.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Founder, Lumina Studios</p>
           </div>
         </section>
       </main>
 
-      {/* Footer with Back to Top */}
-      <footer className="border-t border-gray-200 bg-white">
-        <div className="container mx-auto px-4 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold">SP</div>
-                <span className="text-xl font-bold">Stack Prismal</span>
-              </div>
-              <p className="text-gray-600 max-w-md">High-end creative-tech agency delivering premium websites and visual identities.</p>
-              <div className="flex gap-4 mt-6">
-                <a href="#" className="text-gray-400 hover:text-indigo-600 transition-colors"><Instagram className="h-5 w-5" /></a>
-                <a href="#" className="text-gray-400 hover:text-indigo-600 transition-colors"><Globe className="h-5 w-5" /></a>
-              </div>
-            </div>
+      {/* ---- Footer ---- */}
+      <footer className="border-t border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+            {/* Contact */}
             <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Contact</h4>
-              <p className="text-gray-600">hello@stackprismal.com</p>
-              <p className="text-gray-600 mt-2">+1 (212) 555-0789</p>
-              <p className="text-gray-600 mt-2">New York / Los Angeles</p>
+              <h3 className="font-bold text-lg mb-2">Contact</h3>
+              <a
+                href="mailto:hello@stackprismal.com"
+                className="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-500 transition-colors"
+              >
+                hello@stackprismal.com
+              </a>
             </div>
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Newsletter</h4>
-              <p className="text-gray-600 text-sm">Get creative-tech insights</p>
-              <div className="flex mt-3">
-                <input type="email" placeholder="Email" className="border rounded-l-lg px-3 py-2 text-sm w-full" />
-                <Button className="rounded-l-none bg-indigo-600 text-sm px-3">→</Button>
-              </div>
+
+            {/* Instagram */}
+            <div className="flex items-center gap-2 justify-center md:justify-start">
+              <Instagram className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              <a
+                href="https://instagram.com/stackprismal"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-indigo-500 transition-colors"
+              >
+                @stackprismal
+              </a>
+            </div>
+
+            {/* Back to top */}
+            <div className="md:text-right">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-600 dark:text-gray-400 hover:text-indigo-500"
+                onClick={scrollToTop}
+              >
+                ↑ Back to Top
+              </Button>
             </div>
           </div>
-          <Separator className="my-8" />
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-500">© 2025 Stack Prismal. All rights reserved.</p>
-            <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex items-center gap-2 text-sm text-gray-600 hover:text-indigo-600 transition-colors">
-              Back to Top <ArrowUp className="h-4 w-4" />
-            </button>
+
+          <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-500">
+            © {new Date().getFullYear()} Stack Prismal Studio. All rights reserved.
           </div>
         </div>
       </footer>
