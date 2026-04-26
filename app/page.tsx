@@ -1,364 +1,441 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle2, ArrowRight, Star, Sparkles, TrendingUp, Users, Zap } from "lucide-react";
+import { 
+  CheckCircle2, ArrowRight, Star, Sparkles, Zap, 
+  Code2, Palette, Layout, Globe, Monitor, Brush, 
+  TrendingUp, Users, Layers, ChevronRight, Instagram,
+  ArrowUp, MoveRight, Award, Eye, Filter
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-// Sample data
-const navItems = ["Features", "How It Works", "Pricing", "FAQ"];
-const trustedLogos = ["Acme Corp", "GlobalTech", "Initech", "Massive Dynamic", "Soylent Corp"];
-const problemSolutionPoints = [
-  "Siloed data across tools", "Guesswork in roadmap planning", "Missed user friction points"
-];
-const features = [
-  {
-    title: "Behavioral Analytics",
-    description: "Session replays, heatmaps, and conversion funnels to see exactly how users navigate.",
-    icon: TrendingUp,
-    color: "text-blue-500"
-  },
-  {
-    title: "Feedback & Roadmaps",
-    description: "Capture requests, prioritize with data, and share public roadmaps.",
-    icon: Users,
-    color: "text-purple-500"
-  },
-  {
-    title: "Impact Reporting",
-    description: "Measure feature adoption, retention lift, and ROI with automated reports.",
-    icon: Zap,
-    color: "text-amber-500"
-  }
-];
-const steps = ["Connect your data sources", "Discover insights with one click", "Prioritize and build what matters"];
-const pricingTiers = [
-  { name: "Starter", price: "$0", description: "For individuals and small teams.", features: ["Up to 5 users", "Core analytics", "Community support"], cta: "Get Started", popular: false },
-  { name: "Professional", price: "$49", description: "For growing teams.", features: ["Everything in Starter", "Unlimited projects", "Advanced reporting", "Priority support"], cta: "Start Free Trial", popular: true },
-  { name: "Enterprise", price: "Custom", description: "For large organizations.", features: ["Everything in Professional", "SSO & advanced security", "Dedicated support", "SLA"], cta: "Contact Sales", popular: false }
-];
-const testimonials = [
-  { quote: "Nexus transformed how we build products. We're shipping features our users actually want, twice as fast.", author: "Alex Chen", role: "VP of Product, GlobalTech" },
-  { quote: "The insights from behavioral analytics are incredible. We identified and fixed a major user drop-off point in hours.", author: "Sarah Jenkins", role: "Lead Designer, Initech" }
-];
-const faqs = [
-  { q: "How does the free trial work?", a: "You can try Nexus Professional free for 14 days. No credit card required." },
-  { q: "Can I cancel anytime?", a: "Yes, you can cancel your subscription at any time from your account settings." },
-  { q: "Is my data secure?", a: "Absolutely. We use enterprise-grade encryption and comply with SOC 2 standards." }
+// Portfolio items data
+const portfolioItems = [
+  { id: 1, title: "LUMINA COSMETICS", category: "Web Design", image: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&h=400&fit=crop", desc: "E-commerce UX redesign" },
+  { id: 2, title: "NOVA IDENTITY", category: "Logos", image: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=600&h=400&fit=crop", desc: "Minimalist brand mark" },
+  { id: 3, title: "DIGITAL ALCHEMY", category: "Digital Art", image: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&h=400&fit=crop", desc: "Generative NFT collection" },
+  { id: 4, title: "VERTEX STUDIO", category: "Web Design", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop", desc: "Agency portfolio platform" },
+  { id: 5, title: "EIDETIC", category: "Logos", image: "https://images.unsplash.com/photo-1598550874175-4d0ef436c909?w=600&h=400&fit=crop", desc: "Tech startup wordmark" },
+  { id: 6, title: "CHROMATIC ESCAPE", category: "Digital Art", image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&h=400&fit=crop", desc: "Abstract visual series" },
 ];
 
 export default function Home() {
+  const [activeFilter, setActiveFilter] = useState("All");
+  const filters = ["All", "Web Design", "Logos", "Digital Art"];
+  
+  const filteredPortfolio = activeFilter === "All" 
+    ? portfolioItems 
+    : portfolioItems.filter(item => item.category === activeFilter);
+
+  // Smooth scroll helper
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    element?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50/80 dark:from-gray-950 dark:to-gray-900/80 text-gray-900 dark:text-gray-100">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 dark:bg-gray-950/80">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-bold">N</div>
-            <span className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Nexus</span>
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* Header Navigation */}
+      <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
+        <div className="container mx-auto flex h-20 items-center justify-between px-4 md:px-8">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => scrollToSection("hero")}>
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-200">
+              S
+            </div>
+            <span className="text-2xl font-bold tracking-tight">
+              <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Stack</span>
+              <span className="text-gray-900"> Prismal</span>
+            </span>
           </div>
-          <nav className="hidden md:flex items-center gap-6">
-            {navItems.map((item) => (
-              <a key={item} href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} className="text-sm font-medium hover:text-primary transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all hover:after:w-full">
-                {item}
-              </a>
-            ))}
+          
+          <nav className="hidden md:flex items-center gap-8">
+            <button onClick={() => scrollToSection("work")} className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">Work</button>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors flex items-center gap-1">
+                Services <ChevronRight className="h-3 w-3 rotate-90" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-56 p-2 shadow-xl border-0 rounded-xl">
+                <DropdownMenuItem onClick={() => scrollToSection("services")} className="cursor-pointer rounded-lg py-2">
+                  <Code2 className="mr-2 h-4 w-4 text-indigo-500" /> Web Architecture
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => scrollToSection("services")} className="cursor-pointer rounded-lg py-2">
+                  <Palette className="mr-2 h-4 w-4 text-purple-500" /> Brand Identity
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => scrollToSection("services")} className="cursor-pointer rounded-lg py-2">
+                  <Brush className="mr-2 h-4 w-4 text-pink-500" /> Digital Art & Assets
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <button onClick={() => scrollToSection("about")} className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">About</button>
           </nav>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="hidden md:inline-flex">Log In</Button>
-            <Button size="sm" className="shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow">Request a Demo</Button>
-          </div>
+          
+          <Button className="shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all rounded-full px-6 bg-indigo-600 hover:bg-indigo-700">
+            Start a Project <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
         </div>
       </header>
 
       <main className="flex-1">
-        {/* Hero Section - Enhanced */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-amber-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-amber-950/20">
-          {/* Animated background grid */}
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%239C92AC\' fill-opacity=\'0.05\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30 dark:opacity-10" />
-          
-          {/* Floating orbs */}
-          <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />
-          <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-amber-500/20 blur-3xl" />
-          
-          <div className="container mx-auto px-4 py-20 md:py-32 text-center relative">
-            {/* Premium badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-primary/20 shadow-lg mb-6">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent">
-                Analytics Suite
-              </span>
-              <Badge variant="outline" className="ml-2 border-primary/30 bg-primary/5 text-primary text-xs">
-                New
-              </Badge>
-            </div>
-
-            {/* Main headline */}
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-5xl mx-auto leading-[1.2]">
-              <span className="block text-gray-900 dark:text-white">
-                Turn <span className="bg-gradient-to-r from-primary via-purple-500 to-amber-500 bg-clip-text text-transparent">Data</span> into
-              </span>
-              <span className="block mt-2 bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-white dark:via-gray-300 dark:to-white bg-clip-text text-transparent">
-                Action with{" "}
-                <span className="relative inline-block">
-                  <span className="relative z-10 bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent">
-                    Nexus
-                  </span>
-                  <span className="absolute -inset-x-2 bottom-1 h-3 bg-primary/20 blur-md rounded-full -z-0" />
-                  <span className="absolute -inset-1 -bottom-1 bg-gradient-to-r from-primary/30 to-amber-500/30 blur-xl rounded-full -z-10" />
-                </span>
-              </span>
-            </h1>
-
-            {/* Subheadline */}
-            <div className="relative inline-block mt-6">
-              <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-                Uncover user insights, prioritize features, and build what matters—<br className="hidden sm:block" />
-                all in one collaborative workspace.
-              </p>
-              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent rounded-full" />
-            </div>
-
-            {/* CTA buttons */}
-            <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-5">
-              <Button size="lg" className="gap-2 shadow-2xl shadow-primary/40 hover:shadow-primary/60 transition-all hover:-translate-y-1 px-8 py-6 text-lg rounded-full">
-                Start Free Trial <ArrowRight className="h-5 w-5" />
-              </Button>
-              <Button variant="outline" size="lg" className="border-2 px-8 py-6 text-lg rounded-full hover:bg-primary/5 backdrop-blur-sm">
-                Watch Demo <span className="ml-2 text-primary">→</span>
-              </Button>
-            </div>
-
-            {/* Trusted by line */}
-            <div className="mt-16 flex items-center justify-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-              <span className="h-px w-12 bg-gray-300 dark:bg-gray-700" />
-              <span>Trusted by 2,000+ product teams</span>
-              <span className="h-px w-12 bg-gray-300 dark:bg-gray-700" />
+        {/* Hero Section - Split Screen */}
+        <section id="hero" className="relative min-h-[90vh] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/30 via-white to-purple-50/30" />
+          <div className="container mx-auto px-4 md:px-8 py-20 lg:py-28 relative z-10">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* Left: Text Content */}
+              <div>
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm border border-gray-100 mb-8">
+                  <Sparkles className="h-4 w-4 text-indigo-500" />
+                  <span className="text-sm font-medium text-gray-700">Premium Creative-Tech Studio</span>
+                </div>
+                <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.2]">
+                  Where <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">Technical Precision</span><br />
+                  Meets Creative Vision.
+                </h1>
+                <p className="text-xl text-gray-600 mt-6 leading-relaxed max-w-lg">
+                  Building high-performance websites and distinct visual identities for brands that refuse to blend in.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 mt-10">
+                  <Button size="lg" className="rounded-full px-8 shadow-xl shadow-indigo-200 bg-indigo-600 hover:bg-indigo-700 text-base">
+                    View Our Work <MoveRight className="ml-2 h-4 w-4" />
+                  </Button>
+                  <Button size="lg" variant="outline" className="rounded-full px-8 border-2 text-base">
+                    Explore Services
+                  </Button>
+                </div>
+                <div className="flex items-center gap-6 mt-12 pt-4">
+                  <div className="flex -space-x-2">
+                    {[1,2,3].map((i) => (
+                      <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 border-2 border-white" />
+                    ))}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Trusted by 50+ brands</p>
+                    <p className="text-xs text-gray-500">From startups to Fortune 500</p>
+                  </div>
+                </div>
+              </div>
+              {/* Right: Split Visual */}
+              <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
+                <div className="absolute inset-0 flex">
+                  <div className="w-1/2 bg-gradient-to-br from-indigo-900 to-indigo-700 flex items-center justify-center">
+                    <div className="text-center p-6">
+                      <Monitor className="h-20 w-20 text-white/80 mx-auto mb-4" />
+                      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 w-40 mx-auto">
+                        <div className="h-2 w-full bg-white/30 rounded-full mb-2" />
+                        <div className="h-2 w-3/4 bg-white/20 rounded-full" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-1/2 bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center">
+                    <Brush className="h-20 w-20 text-white/90" />
+                    <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 0h20v20H0V0zm20 20h20v20H20V20z\'/%3E%3C/g%3E%3C/svg%3E')]" />
+                  </div>
+                </div>
+                <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md rounded-full px-4 py-1 text-white text-xs">Web Architecture</div>
+                <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md rounded-full px-4 py-1 text-white text-xs">Digital Art</div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Social Proof Section */}
-        <section className="container mx-auto px-4 py-12 border-t border-gray-200 dark:border-gray-800">
-          <p className="text-center text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Trusted by product teams at</p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
-            {trustedLogos.map((logo) => (
-              <div key={logo} className="text-2xl font-bold bg-gradient-to-r from-gray-400 to-gray-500 bg-clip-text text-transparent dark:from-gray-500 dark:to-gray-400">{logo}</div>
+        {/* Work / Portfolio Section with Filtering */}
+        <section id="work" className="container mx-auto px-4 py-24 md:py-32 border-t border-gray-100">
+          <div className="text-center mb-16">
+            <Badge variant="outline" className="mb-4 border-indigo-200 bg-indigo-50 text-indigo-700 rounded-full px-4 py-1">PORTFOLIO</Badge>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Selected works</h2>
+            <p className="mt-4 text-gray-600 max-w-2xl mx-auto">Blending technical excellence with artistic expression</p>
+          </div>
+          
+          {/* Filter Buttons */}
+          <div className="flex flex-wrap justify-center gap-3 mb-12">
+            {filters.map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setActiveFilter(filter)}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                  activeFilter === filter
+                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-200"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {filter}
+              </button>
             ))}
           </div>
-        </section>
-
-        {/* Problem / Solution Section */}
-        <section className="container mx-auto px-4 py-20 border-t border-gray-200 dark:border-gray-800">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
-                Stop guessing.<br />Start knowing.
-              </h2>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-                Building products without data is like navigating in the dark. Nexus illuminates the path.
-              </p>
-              <ul className="mt-6 space-y-3">
-                {problemSolutionPoints.map((point, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-600 dark:text-gray-400">Stop {point.toLowerCase()}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/5 rounded-2xl p-8 text-center shadow-2xl border border-primary/20">
-              <p className="text-6xl mb-4">📊</p>
-              <h3 className="text-2xl font-semibold">Actionable Insights Dashboard</h3>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">Visualize user behavior and feature impact in real-time.</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Features Section */}
-        <section id="features" className="container mx-auto px-4 py-20 border-t border-gray-200 dark:border-gray-800">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Everything you need to move faster</h2>
-            <p className="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Nexus gives your team the clarity and confidence to build the right things, faster.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Card key={index} className="group border-gray-200 dark:border-gray-800 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-                  <CardHeader>
-                    <div className={`h-12 w-12 rounded-lg ${feature.color} bg-opacity-10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                      <Icon className={`h-6 w-6 ${feature.color}`} />
-                    </div>
-                    <CardTitle className="text-xl">{feature.title}</CardTitle>
-                    <CardDescription className="text-base">{feature.description}</CardDescription>
-                  </CardHeader>
-                </Card>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* How It Works Section */}
-        <section id="how-it-works" className="container mx-auto px-4 py-20 border-t border-gray-200 dark:border-gray-800 bg-gradient-to-b from-gray-50/50 to-white dark:from-gray-900/50 dark:to-gray-950">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Get started in minutes</h2>
-            <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">Connect your tools and start uncovering insights right away.</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto relative">
-            {steps.map((step, index) => (
-              <div key={index} className="text-center relative z-10">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/60 text-white flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-lg shadow-primary/30">
-                  {index + 1}
+          
+          {/* Portfolio Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredPortfolio.map((item) => (
+              <div key={item.id} className="group relative rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                <div className="aspect-[4/3] overflow-hidden">
+                  <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{step}</h3>
-                {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-8 left-[calc(33%+2rem)] w-[calc(33%-4rem)] h-0.5 bg-gradient-to-r from-primary/30 to-primary/60" />
-                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                  <Badge className="w-fit mb-2 bg-white/20 backdrop-blur-sm text-white border-0">{item.category}</Badge>
+                  <h3 className="text-white text-xl font-bold">{item.title}</h3>
+                  <p className="text-gray-200 text-sm">{item.desc}</p>
+                </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Pricing Section */}
-        <section id="pricing" className="container mx-auto px-4 py-20 border-t border-gray-200 dark:border-gray-800">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Simple, transparent pricing</h2>
-            <p className="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Choose the plan that fits your team.</p>
+        {/* Services Section - Three Pillars */}
+        <section id="services" className="bg-gradient-to-b from-gray-50 to-white border-y border-gray-100 py-24 md:py-32">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <Badge variant="outline" className="mb-4 border-indigo-200 bg-indigo-50 text-indigo-700 rounded-full px-4 py-1">EXPERTISE</Badge>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Three pillars of <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">excellence</span></h2>
+              <p className="mt-4 text-gray-600 max-w-2xl mx-auto">Comprehensive solutions that cover every angle of your digital presence</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 rounded-2xl">
+                <CardHeader>
+                  <div className="h-14 w-14 rounded-2xl bg-indigo-100 flex items-center justify-center mb-6">
+                    <Code2 className="h-7 w-7 text-indigo-600" />
+                  </div>
+                  <CardTitle className="text-2xl">Web Architecture</CardTitle>
+                  <CardDescription className="text-gray-500 mt-2">Custom coding, redesigns, and mobile optimization</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-indigo-500" />Performance-first engineering</li>
+                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-indigo-500" />SEO & conversion optimized</li>
+                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-indigo-500" />Headless & traditional CMS</li>
+                  </ul>
+                  <div className="mt-6 pt-4 border-t border-gray-100">
+                    <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">Focus: Speed & Results</span>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 rounded-2xl">
+                <CardHeader>
+                  <div className="h-14 w-14 rounded-2xl bg-purple-100 flex items-center justify-center mb-6">
+                    <Palette className="h-7 w-7 text-purple-600" />
+                  </div>
+                  <CardTitle className="text-2xl">Brand Identity</CardTitle>
+                  <CardDescription className="text-gray-500 mt-2">Logo design, typography, and visual language</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-purple-500" />Distinct positioning</li>
+                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-purple-500" />Comprehensive guidelines</li>
+                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-purple-500" />Memorable visual systems</li>
+                  </ul>
+                  <div className="mt-6 pt-4 border-t border-gray-100">
+                    <span className="text-xs font-semibold text-purple-600 uppercase tracking-wider">Focus: Being Unforgettable</span>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 rounded-2xl">
+                <CardHeader>
+                  <div className="h-14 w-14 rounded-2xl bg-pink-100 flex items-center justify-center mb-6">
+                    <Brush className="h-7 w-7 text-pink-600" />
+                  </div>
+                  <CardTitle className="text-2xl">Digital Art & Assets</CardTitle>
+                  <CardDescription className="text-gray-500 mt-2">Custom illustrations, prints, and motion graphics</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-pink-500" />Original digital paintings</li>
+                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-pink-500" />3D & generative art</li>
+                    <li className="flex items-center gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-pink-500" />Limited edition prints</li>
+                  </ul>
+                  <div className="mt-6 pt-4 border-t border-gray-100">
+                    <span className="text-xs font-semibold text-pink-600 uppercase tracking-wider">Focus: Unique Aesthetics</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Stack vs Prismal Section - Brand Story */}
+        <section className="container mx-auto px-4 py-24 md:py-32">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <Badge variant="outline" className="mb-4 border-indigo-200 bg-indigo-50 text-indigo-700 rounded-full">THE DUAL IDENTITY</Badge>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+                The <span className="bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent">Stack</span> meets 
+                the <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Prismal</span>
+              </h2>
+              <div className="mt-8 space-y-6">
+                <div className="border-l-4 border-indigo-500 pl-6">
+                  <h3 className="text-2xl font-semibold flex items-center gap-2"><Code2 className="h-5 w-5 text-indigo-500" /> The Stack</h3>
+                  <p className="text-gray-600 mt-2">Clean code, robust architecture, SEO-first thinking, and bulletproof functionality. We engineer digital experiences that perform relentlessly.</p>
+                </div>
+                <div className="border-l-4 border-purple-500 pl-6">
+                  <h3 className="text-2xl font-semibold flex items-center gap-2"><Brush className="h-5 w-5 text-purple-500" /> The Prismal</h3>
+                  <p className="text-gray-600 mt-2">Color theory, emotional design, digital painting, and visual storytelling. We craft identities that resonate deeply and stand out.</p>
+                </div>
+              </div>
+              <p className="mt-8 text-lg text-gray-700 bg-gray-50 p-6 rounded-2xl italic">"You don't have to choose between a boring coder and a flaky artist. You get both."</p>
+            </div>
+            <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 rounded-3xl p-8 shadow-xl">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white rounded-xl p-4 shadow-md text-center">
+                  <Zap className="h-8 w-8 text-indigo-500 mx-auto" />
+                  <p className="font-mono text-sm mt-2">99.9% Uptime</p>
+                </div>
+                <div className="bg-white rounded-xl p-4 shadow-md text-center">
+                  <Award className="h-8 w-8 text-purple-500 mx-auto" />
+                  <p className="font-mono text-sm mt-2">Awwwards Nom.</p>
+                </div>
+                <div className="bg-white rounded-xl p-4 shadow-md text-center">
+                  <Globe className="h-8 w-8 text-cyan-500 mx-auto" />
+                  <p className="font-mono text-sm mt-2">Global Clients</p>
+                </div>
+                <div className="bg-white rounded-xl p-4 shadow-md text-center">
+                  <Eye className="h-8 w-8 text-pink-500 mx-auto" />
+                  <p className="font-mono text-sm mt-2">Art Exhibitions</p>
+                </div>
+              </div>
+              <div className="absolute -top-4 -right-4 w-24 h-24 bg-indigo-100 rounded-full blur-3xl opacity-50" />
+            </div>
+          </div>
+        </section>
+
+        {/* Redesign Specialized Block - Before & After */}
+        <section className="bg-gray-900 text-white py-24 md:py-32">
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <Badge variant="outline" className="mb-4 border-white/30 bg-white/10 text-white rounded-full">REDESIGN SPECIALIST</Badge>
+              <h2 className="text-4xl md:text-5xl font-bold">Is your current website costing you customers?</h2>
+              <p className="text-xl text-gray-300 mt-4">We transform outdated sites into high-converting digital assets.</p>
+            </div>
+            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              <div className="bg-gray-800 rounded-2xl overflow-hidden shadow-2xl">
+                <div className="bg-red-500/10 p-4 border-b border-red-500/20">
+                  <h3 className="text-xl font-semibold flex items-center gap-2"><span className="text-red-400">●</span> Before</h3>
+                </div>
+                <div className="p-6">
+                  <div className="bg-gray-700 rounded-lg h-48 mb-4 flex items-center justify-center">
+                    <Layout className="h-16 w-16 text-gray-500" />
+                  </div>
+                  <ul className="space-y-2 text-gray-300">
+                    <li className="flex items-center gap-2"><span className="text-red-400">✗</span> Slow load times</li>
+                    <li className="flex items-center gap-2"><span className="text-red-400">✗</span> Outdated aesthetics</li>
+                    <li className="flex items-center gap-2"><span className="text-red-400">✗</span> Low conversion rates</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="bg-gray-800 rounded-2xl overflow-hidden shadow-2xl border-2 border-indigo-500">
+                <div className="bg-indigo-500/10 p-4 border-b border-indigo-500/20">
+                  <h3 className="text-xl font-semibold flex items-center gap-2"><span className="text-green-400">●</span> After</h3>
+                </div>
+                <div className="p-6">
+                  <div className="bg-gradient-to-br from-indigo-900 to-purple-900 rounded-lg h-48 mb-4 flex items-center justify-center">
+                    <Sparkles className="h-16 w-16 text-white" />
+                  </div>
+                  <ul className="space-y-2 text-gray-300">
+                    <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Blazing fast (LCP &lt; 2s)</li>
+                    <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Modern, artistic design</li>
+                    <li className="flex items-center gap-2"><span className="text-green-400">✓</span> +156% conversion lift</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div className="text-center mt-12">
+              <Button size="lg" className="rounded-full bg-white text-gray-900 hover:bg-gray-100 shadow-xl shadow-white/20">
+                Request a Redesign Audit <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Process Section - 3 Simple Steps */}
+        <section className="container mx-auto px-4 py-24 md:py-32">
+          <div className="text-center mb-16">
+            <Badge variant="outline" className="mb-4 border-indigo-200 bg-indigo-50 text-indigo-700 rounded-full">SIMPLE PROCESS</Badge>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">From concept to launch in <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">three steps</span></h2>
+            <p className="mt-4 text-gray-600 max-w-2xl mx-auto">No complexity, no surprises. Just a smooth path to an exceptional digital presence.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {pricingTiers.map((tier, index) => (
-              <Card key={index} className={`relative border-gray-200 dark:border-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 overflow-visible ${tier.popular ? 'border-primary border-2 shadow-primary/20' : ''}`}>
-                {tier.popular && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-primary/80 text-white shadow-md z-10 whitespace-nowrap">
-                    Most Popular
-                  </Badge>
-                )}
-                <CardHeader>
-                  <CardTitle>{tier.name}</CardTitle>
-                  <CardDescription>{tier.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="grid gap-4">
-                  <div className="text-3xl font-bold">{tier.price}<span className="text-sm font-normal text-gray-600 dark:text-gray-400">/month</span></div>
-                  <Separator />
-                  <ul className="space-y-2">
-                    {tier.features.map((feature, fIndex) => (
-                      <li key={fIndex} className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-green-500" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button variant={tier.popular ? "default" : "outline"} className={`w-full mt-4 ${tier.popular ? 'shadow-lg shadow-primary/30 hover:shadow-primary/50' : ''}`}>
-                    {tier.cta}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+            <div className="text-center relative">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-400 text-white flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-xl shadow-indigo-200">1</div>
+              <h3 className="text-2xl font-semibold mb-3">Discovery</h3>
+              <p className="text-gray-600">We talk about your goals, vision, and audience. Deep dive into your brand story and technical needs.</p>
+            </div>
+            <div className="text-center relative">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-400 text-white flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-xl shadow-purple-200">2</div>
+              <h3 className="text-2xl font-semibold mb-3">Creation</h3>
+              <p className="text-gray-600">We build your custom "Stack" (tech) and "Prism" (art) elements — iterative design and development.</p>
+            </div>
+            <div className="text-center relative">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-pink-600 to-pink-400 text-white flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-xl shadow-pink-200">3</div>
+              <h3 className="text-2xl font-semibold mb-3">Launch</h3>
+              <p className="text-gray-600">Your brand goes live and starts performing. We provide post-launch support and analytics.</p>
+            </div>
           </div>
         </section>
 
-        {/* Testimonials Section */}
-        <section className="container mx-auto px-4 py-20 border-t border-gray-200 dark:border-gray-800 bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-900/80">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Loved by product teams</h2>
-            <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">See what our customers are saying.</p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-gray-200 dark:border-gray-800 shadow-md hover:shadow-xl transition-all bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-yellow-500 text-yellow-500" />)}
-                  </div>
-                  <p className="text-lg italic">"{testimonial.quote}"</p>
-                  <div className="mt-4">
-                    <p className="font-semibold">{testimonial.author}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{testimonial.role}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        {/* FAQ Section */}
-        <section id="faq" className="container mx-auto px-4 py-20 border-t border-gray-200 dark:border-gray-800">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Frequently Asked Questions</h2>
-            <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">Everything you need to know.</p>
-          </div>
-          <div className="max-w-4xl mx-auto grid gap-6">
-            {faqs.map((faq, index) => (
-              <Card key={index} className="border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <CardTitle className="text-lg">{faq.q}</CardTitle>
-                  <CardDescription className="text-base">{faq.a}</CardDescription>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        {/* Final CTA Section */}
-        <section className="container mx-auto px-4 py-20 border-t border-gray-200 dark:border-gray-800">
-          <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent dark:from-primary/20 dark:to-primary/5 rounded-3xl p-12 text-center border border-primary/20 shadow-2xl">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-              Ready to build better products?
-            </h2>
-            <p className="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Join thousands of product teams using Nexus to drive growth.</p>
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" className="gap-2 shadow-xl shadow-primary/40 hover:shadow-primary/60 transition-all hover:-translate-y-0.5">
-                Start Free Trial <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="lg" className="border-2">
-                Contact Sales
-              </Button>
+        {/* About Section - Origin Story */}
+        <section id="about" className="bg-gray-50 border-y border-gray-100 py-24 md:py-32">
+          <div className="container mx-auto px-4 text-center max-w-4xl">
+            <Badge variant="outline" className="mb-4 border-indigo-200 bg-indigo-50 text-indigo-700 rounded-full">OUR ORIGIN STORY</Badge>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Frustrated by the <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">divide</span> between devs and designers</h2>
+            <p className="text-xl text-gray-600 mt-6 leading-relaxed">Stack Prismal was born from a simple belief: the best digital work happens when technical rigor and artistic vision are fused from day one. We're a studio of engineer-artists who speak both languages fluently.</p>
+            <div className="mt-10 flex justify-center gap-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-indigo-600">50+</div>
+                <div className="text-sm text-gray-500">Projects delivered</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-purple-600">100%</div>
+                <div className="text-sm text-gray-500">Client retention rate</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-pink-600">12</div>
+                <div className="text-sm text-gray-500">Design awards</div>
+              </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="font-bold text-lg mb-4">Product</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">Features</a></li>
-                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">Pricing</a></li>
-                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">Integrations</a></li>
-              </ul>
+      {/* Footer with Back to Top */}
+      <footer className="border-t border-gray-200 bg-white">
+        <div className="container mx-auto px-4 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+            <div className="col-span-1 md:col-span-2">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold">SP</div>
+                <span className="text-xl font-bold">Stack Prismal</span>
+              </div>
+              <p className="text-gray-600 max-w-md">High-end creative-tech agency delivering premium websites and visual identities.</p>
+              <div className="flex gap-4 mt-6">
+                <a href="#" className="text-gray-400 hover:text-indigo-600 transition-colors"><Instagram className="h-5 w-5" /></a>
+                <a href="#" className="text-gray-400 hover:text-indigo-600 transition-colors"><Globe className="h-5 w-5" /></a>
+              </div>
             </div>
             <div>
-              <h3 className="font-bold text-lg mb-4">Company</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">About</a></li>
-                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">Blog</a></li>
-                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">Careers</a></li>
-              </ul>
+              <h4 className="font-semibold text-gray-900 mb-4">Contact</h4>
+              <p className="text-gray-600">hello@stackprismal.com</p>
+              <p className="text-gray-600 mt-2">+1 (212) 555-0789</p>
+              <p className="text-gray-600 mt-2">New York / Los Angeles</p>
             </div>
             <div>
-              <h3 className="font-bold text-lg mb-4">Resources</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">Documentation</a></li>
-                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">Help Center</a></li>
-                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">Community</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold text-lg mb-4">Legal</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">Privacy</a></li>
-                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">Terms</a></li>
-                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">Security</a></li>
-              </ul>
+              <h4 className="font-semibold text-gray-900 mb-4">Newsletter</h4>
+              <p className="text-gray-600 text-sm">Get creative-tech insights</p>
+              <div className="flex mt-3">
+                <input type="email" placeholder="Email" className="border rounded-l-lg px-3 py-2 text-sm w-full" />
+                <Button className="rounded-l-none bg-indigo-600 text-sm px-3">→</Button>
+              </div>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-600 dark:text-gray-400">
-            <p>© 2026 Nexus Analytics, Inc. All rights reserved.</p>
+          <Separator className="my-8" />
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-gray-500">© 2025 Stack Prismal. All rights reserved.</p>
+            <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex items-center gap-2 text-sm text-gray-600 hover:text-indigo-600 transition-colors">
+              Back to Top <ArrowUp className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </footer>
